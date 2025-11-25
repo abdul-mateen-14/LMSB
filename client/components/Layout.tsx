@@ -1,148 +1,129 @@
-import { Link } from "react-router-dom";
-import { Code2 } from "lucide-react";
-import React from "react";
+import { Link, useLocation } from "react-router-dom";
+import {
+  BookOpen,
+  Users,
+  RotateCcw,
+  BarChart3,
+  Settings,
+  LogOut,
+  Menu,
+  X,
+  Home,
+} from "lucide-react";
+import React, { useState } from "react";
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
-export default function Layout({ children }: LayoutProps) {
-  return (
-    <div className="min-h-screen flex flex-col bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="p-2 rounded-lg bg-gradient-to-br from-purple-600 to-blue-500">
-              <Code2 className="w-5 h-5 text-white" />
-            </div>
-            <div className="hidden sm:flex flex-col">
-              <span className="font-bold text-lg text-gradient">LibraryX</span>
-              <span className="text-xs text-muted-foreground">Array System</span>
-            </div>
-          </Link>
+const navItems = [
+  { label: "Dashboard", icon: Home, path: "/" },
+  { label: "Books", icon: BookOpen, path: "/books" },
+  { label: "Members", icon: Users, path: "/members" },
+  { label: "Borrowing", icon: RotateCcw, path: "/borrowing" },
+  { label: "Reports", icon: BarChart3, path: "/reports" },
+  { label: "Settings", icon: Settings, path: "/settings" },
+];
 
-          <nav className="hidden md:flex items-center gap-8">
-            <Link
-              to="/"
-              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
-            >
-              Home
+export default function Layout({ children }: LayoutProps) {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const location = useLocation();
+
+  return (
+    <div className="min-h-screen flex bg-background">
+      {/* Sidebar */}
+      <aside
+        className={`fixed left-0 top-0 h-screen bg-sidebar border-r border-sidebar-border transition-all duration-300 z-40 ${
+          sidebarOpen ? "w-64" : "w-20"
+        }`}
+      >
+        <div className="flex flex-col h-full">
+          {/* Logo */}
+          <div className="p-6 border-b border-sidebar-border">
+            <Link to="/" className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center flex-shrink-0">
+                <BookOpen className="w-6 h-6 text-primary-foreground" />
+              </div>
+              {sidebarOpen && (
+                <div className="flex flex-col">
+                  <span className="font-bold text-sidebar-foreground">
+                    LibraryPro
+                  </span>
+                  <span className="text-xs text-sidebar-accent-foreground">
+                    v1.0
+                  </span>
+                </div>
+              )}
             </Link>
-            <Link
-              to="/libraries"
-              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
-            >
-              Libraries
-            </Link>
-            <Link
-              to="/documentation"
-              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
-            >
-              Docs
-            </Link>
+          </div>
+
+          {/* Navigation */}
+          <nav className="flex-1 overflow-y-auto px-4 py-6 space-y-2">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.path;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                    isActive
+                      ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent text-sidebar-accent-foreground"
+                  }`}
+                  title={!sidebarOpen ? item.label : ""}
+                >
+                  <Icon className="w-5 h-5 flex-shrink-0" />
+                  {sidebarOpen && <span className="text-sm font-medium">{item.label}</span>}
+                </Link>
+              );
+            })}
           </nav>
 
-          <div className="flex items-center gap-4">
-            <button className="px-4 py-2 text-sm font-medium rounded-lg border border-border hover:bg-muted transition-colors">
-              Sign In
-            </button>
-            <button className="px-4 py-2 text-sm font-medium rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white hover:shadow-lg hover:shadow-purple-500/20 transition-all">
-              Get Started
+          {/* Footer */}
+          <div className="p-4 border-t border-sidebar-border space-y-2">
+            <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sidebar-accent-foreground hover:bg-sidebar-accent transition-colors">
+              <LogOut className="w-5 h-5 flex-shrink-0" />
+              {sidebarOpen && <span className="text-sm">Logout</span>}
             </button>
           </div>
         </div>
-      </header>
+      </aside>
 
       {/* Main Content */}
-      <main className="flex-1">{children}</main>
+      <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"}`}>
+        {/* Top Bar */}
+        <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur">
+          <div className="px-6 py-4 flex items-center justify-between">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-2 hover:bg-muted rounded-lg transition-colors"
+            >
+              {sidebarOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
+            </button>
 
-      {/* Footer */}
-      <footer className="border-t border-border/50 bg-muted/30 mt-20">
-        <div className="container mx-auto px-4 py-12">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
-            <div>
-              <h3 className="font-semibold text-foreground mb-4">Product</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
-                    Features
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
-                    Pricing
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold text-foreground mb-4">Developers</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
-                    Documentation
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
-                    API Reference
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold text-foreground mb-4">Company</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
-                    About
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
-                    Blog
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold text-foreground mb-4">Legal</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
-                    Privacy
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
-                    Terms
-                  </a>
-                </li>
-              </ul>
+            <div className="flex items-center gap-4">
+              <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg bg-muted">
+                <span className="text-sm text-muted-foreground">
+                  Welcome, Librarian
+                </span>
+              </div>
+              <button className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 hover:bg-primary/20 transition-colors flex items-center justify-center font-semibold text-primary">
+                LB
+              </button>
             </div>
           </div>
-          <div className="border-t border-border pt-8 flex flex-col sm:flex-row justify-between items-center">
-            <p className="text-sm text-muted-foreground">
-              © 2024 LibraryX. All rights reserved.
-            </p>
-            <div className="flex gap-6 mt-4 sm:mt-0">
-              <a
-                href="#"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <span className="text-sm">Twitter</span>
-              </a>
-              <a
-                href="#"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <span className="text-sm">GitHub</span>
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
+        </header>
+
+        {/* Page Content */}
+        <main className="p-6">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }
