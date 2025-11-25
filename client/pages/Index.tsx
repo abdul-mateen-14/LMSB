@@ -1,324 +1,249 @@
-import { useEffect, useState } from "react";
 import Layout from "@/components/Layout";
+import { useState, useEffect } from "react";
 import {
-  Code2,
-  Database,
-  Zap,
-  GitBranch,
-  ArrowRight,
-  Play,
-  Cpu,
+  BookOpen,
+  Users,
+  RotateCcw,
+  TrendingUp,
+  AlertCircle,
 } from "lucide-react";
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
-interface Library {
-  id: string;
-  name: string;
-  description: string;
-  itemCount: number;
-  language: string;
-  updated: string;
+interface StatCard {
+  label: string;
+  value: string;
+  icon: React.ComponentType<{ className?: string }>;
+  trend?: string;
   color: string;
 }
 
-const sampleLibraries: Library[] = [
-  {
-    id: "1",
-    name: "Data Structures",
-    description:
-      "Core C++ data structure implementations including vectors, stacks, queues, and linked lists.",
-    itemCount: 156,
-    language: "C++",
-    updated: "2 hours ago",
-    color: "from-purple-600 to-purple-400",
-  },
-  {
-    id: "2",
-    name: "Algorithms",
-    description:
-      "High-performance algorithm implementations for sorting, searching, and graph operations.",
-    itemCount: 89,
-    language: "C++",
-    updated: "5 hours ago",
-    color: "from-blue-600 to-blue-400",
-  },
-  {
-    id: "3",
-    name: "Utilities",
-    description:
-      "Helper functions and utility classes for memory management and resource handling.",
-    itemCount: 42,
-    language: "C++",
-    updated: "1 day ago",
-    color: "from-cyan-600 to-cyan-400",
-  },
-  {
-    id: "4",
-    name: "Testing Suite",
-    description:
-      "Comprehensive test cases and benchmarking tools for validating library performance.",
-    itemCount: 234,
-    language: "C++",
-    updated: "3 hours ago",
-    color: "from-emerald-600 to-emerald-400",
-  },
-  {
-    id: "5",
-    name: "Graphics",
-    description:
-      "Matrix and vector operations optimized for 3D graphics and computational geometry.",
-    itemCount: 67,
-    language: "C++",
-    updated: "1 week ago",
-    color: "from-orange-600 to-orange-400",
-  },
-  {
-    id: "6",
-    name: "Networking",
-    description:
-      "Socket handling and protocol implementations for inter-process communication.",
-    itemCount: 98,
-    language: "C++",
-    updated: "4 days ago",
-    color: "from-pink-600 to-pink-400",
-  },
-];
+interface ChartDataPoint {
+  name: string;
+  value: number;
+}
 
-const features = [
-  {
-    icon: Database,
-    title: "Dynamic Arrays",
-    description:
-      "Flexible, high-performance array structures that grow and adapt to your needs",
-  },
-  {
-    icon: Cpu,
-    title: "C++ Backend",
-    description:
-      "Blazing-fast implementation with direct memory access and zero-copy operations",
-  },
-  {
-    icon: Zap,
-    title: "Real-time Sync",
-    description:
-      "Live updates across all connected clients with instant synchronization",
-  },
-  {
-    icon: GitBranch,
-    title: "Version Control",
-    description: "Track changes, manage versions, and collaborate seamlessly",
-  },
-];
+interface BorrowData {
+  name: string;
+  books: number;
+}
 
-export default function Index() {
-  const [libraries, setLibraries] = useState<Library[]>([]);
+const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate loading delay for visual effect
-    const timer = setTimeout(() => {
-      setLibraries(sampleLibraries);
-      setIsLoading(false);
-    }, 300);
+    const timer = setTimeout(() => setIsLoading(false), 500);
     return () => clearTimeout(timer);
   }, []);
 
+  const stats: StatCard[] = [
+    {
+      label: "Total Books",
+      value: "2,456",
+      icon: BookOpen,
+      trend: "+12% this month",
+      color: "bg-blue-500/10 text-blue-600",
+    },
+    {
+      label: "Active Members",
+      value: "384",
+      icon: Users,
+      trend: "+8% this month",
+      color: "bg-green-500/10 text-green-600",
+    },
+    {
+      label: "Books Borrowed",
+      value: "147",
+      icon: RotateCcw,
+      trend: "This month",
+      color: "bg-orange-500/10 text-orange-600",
+    },
+    {
+      label: "Overdue Books",
+      value: "12",
+      icon: AlertCircle,
+      trend: "Needs attention",
+      color: "bg-red-500/10 text-red-600",
+    },
+  ];
+
+  const chartData: ChartDataPoint[] = [
+    { name: "Jan", value: 65 },
+    { name: "Feb", value: 78 },
+    { name: "Mar", value: 82 },
+    { name: "Apr", value: 91 },
+    { name: "May", value: 87 },
+    { name: "Jun", value: 95 },
+  ];
+
+  const borrowData: BorrowData[] = [
+    { name: "Fiction", books: 234 },
+    { name: "Non-Fiction", books: 189 },
+    { name: "Academic", books: 167 },
+    { name: "Reference", books: 98 },
+  ];
+
+  const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"];
+
+  const recentActivity = [
+    { id: 1, member: "John Doe", action: "Borrowed", book: "The Great Gatsby", date: "2 hours ago" },
+    { id: 2, member: "Jane Smith", action: "Returned", book: "1984", date: "5 hours ago" },
+    { id: 3, member: "Mike Johnson", action: "Borrowed", book: "To Kill a Mockingbird", date: "1 day ago" },
+    { id: 4, member: "Sarah Williams", action: "Reserved", book: "Pride and Prejudice", date: "2 days ago" },
+  ];
+
   return (
     <Layout>
-      {/* Hero Section */}
-      <section className="relative overflow-hidden pt-20 pb-32">
-        {/* Gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 via-transparent to-transparent pointer-events-none" />
-        <div className="absolute top-40 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full border border-purple-500/30 bg-purple-500/5">
-              <span className="w-2 h-2 rounded-full bg-purple-500" />
-              <span className="text-sm font-medium text-purple-600">
-                Introducing LibraryX
-              </span>
-            </div>
-
-            <h1 className="text-5xl sm:text-6xl font-bold mb-6 text-gradient leading-tight">
-              Dynamic Array-Based Library System
-            </h1>
-
-            <p className="text-xl text-muted-foreground mb-8 leading-relaxed max-w-2xl">
-              Build, manage, and deploy powerful C++ libraries with our
-              intelligent array system. Real-time collaboration, version control,
-              and lightning-fast performance all in one platform.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 mb-12">
-              <button className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-medium hover:shadow-lg hover:shadow-purple-500/30 transition-all">
-                <Play className="w-5 h-5" />
-                Get Started Now
-              </button>
-              <button className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg border border-border bg-background hover:bg-muted transition-colors font-medium">
-                <Code2 className="w-5 h-5" />
-                View Documentation
-              </button>
-            </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-4 sm:gap-8">
-              <div>
-                <div className="text-2xl sm:text-3xl font-bold text-primary">
-                  1M+
-                </div>
-                <p className="text-sm text-muted-foreground">Arrays Deployed</p>
-              </div>
-              <div>
-                <div className="text-2xl sm:text-3xl font-bold text-primary">
-                  99.9%
-                </div>
-                <p className="text-sm text-muted-foreground">Uptime SLA</p>
-              </div>
-              <div>
-                <div className="text-2xl sm:text-3xl font-bold text-primary">
-                  10ms
-                </div>
-                <p className="text-sm text-muted-foreground">Avg Latency</p>
-              </div>
-            </div>
-          </div>
+      <div className="space-y-6">
+        {/* Header */}
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
+          <p className="text-muted-foreground mt-2">Welcome back! Here's your library overview.</p>
         </div>
-      </section>
 
-      {/* Features Section */}
-      <section className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="max-w-2xl mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-              Powerful Features
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              Everything you need to build, deploy, and maintain production-grade
-              array-based libraries
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {features.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <div
-                  key={index}
-                  className="group p-6 rounded-lg border border-border/50 bg-card hover:border-purple-500/30 transition-all hover:shadow-lg"
-                >
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-br from-purple-600/20 to-blue-500/20 group-hover:from-purple-600/30 group-hover:to-blue-500/30 transition-all mb-4">
-                    <Icon className="w-6 h-6 text-purple-600" />
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {stats.map((stat, index) => {
+            const Icon = stat.icon;
+            return (
+              <div
+                key={index}
+                className="stat-card animate-slide-down"
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${stat.color}`}>
+                    <Icon className="w-6 h-6" />
                   </div>
-                  <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-                  <p className="text-muted-foreground">{feature.description}</p>
+                  {stat.trend && (
+                    <div className="text-xs font-medium text-green-600 bg-green-500/10 px-2 py-1 rounded">
+                      {stat.trend}
+                    </div>
+                  )}
                 </div>
-              );
-            })}
+                <p className="text-muted-foreground text-sm mb-1">{stat.label}</p>
+                <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Borrowing Trend */}
+          <div className="card-hover p-6">
+            <h2 className="text-lg font-semibold mb-4">Borrowing Trend</h2>
+            {isLoading ? (
+              <div className="h-64 bg-muted/30 rounded-lg animate-pulse" />
+            ) : (
+              <ResponsiveContainer width="100%" height={250}>
+                <LineChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" />
+                  <YAxis stroke="hsl(var(--muted-foreground))" />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "hsl(var(--card))",
+                      border: "1px solid hsl(var(--border))",
+                      borderRadius: "8px",
+                    }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="value"
+                    stroke="hsl(var(--primary))"
+                    strokeWidth={2}
+                    dot={{ fill: "hsl(var(--primary))", r: 5 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+
+          {/* Books by Category */}
+          <div className="card-hover p-6">
+            <h2 className="text-lg font-semibold mb-4">Books by Category</h2>
+            {isLoading ? (
+              <div className="h-64 bg-muted/30 rounded-lg animate-pulse" />
+            ) : (
+              <ResponsiveContainer width="100%" height={250}>
+                <PieChart>
+                  <Pie
+                    data={borrowData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={90}
+                    paddingAngle={2}
+                    dataKey="books"
+                  >
+                    {borrowData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "hsl(var(--card))",
+                      border: "1px solid hsl(var(--border))",
+                      borderRadius: "8px",
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
-      </section>
 
-      {/* Libraries Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between mb-12">
-            <div className="max-w-2xl">
-              <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-                Featured Libraries
-              </h2>
-              <p className="text-lg text-muted-foreground">
-                Explore and browse our curated collection of production-ready
-                C++ libraries
-              </p>
-            </div>
-            <button className="hidden sm:inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors">
-              View All
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-
+        {/* Monthly Borrows Bar Chart */}
+        <div className="card-hover p-6">
+          <h2 className="text-lg font-semibold mb-4">Monthly Activity</h2>
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div
-                  key={i}
-                  className="h-64 rounded-lg bg-muted/50 animate-pulse"
-                />
-              ))}
-            </div>
+            <div className="h-64 bg-muted/30 rounded-lg animate-pulse" />
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {libraries.map((lib) => (
-                <div
-                  key={lib.id}
-                  className="group card-elevated hover:border-purple-500/30 cursor-pointer p-6 transition-all"
-                >
-                  <div className={`w-full h-2 rounded-full bg-gradient-to-r ${lib.color} mb-4`} />
-
-                  <h3 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">
-                    {lib.name}
-                  </h3>
-
-                  <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
-                    {lib.description}
-                  </p>
-
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Items:</span>
-                      <span className="font-semibold text-foreground">
-                        {lib.itemCount}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Language:</span>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-blue-500" />
-                        <span className="font-semibold text-foreground">
-                          {lib.language}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Updated:</span>
-                      <span className="text-muted-foreground text-xs">
-                        {lib.updated}
-                      </span>
-                    </div>
-                  </div>
-
-                  <button className="mt-4 w-full py-2 px-4 rounded-lg border border-border hover:border-purple-500/50 hover:bg-purple-500/5 transition-all text-sm font-medium flex items-center justify-center gap-2">
-                    <Code2 className="w-4 h-4" />
-                    Browse Array
-                  </button>
-                </div>
-              ))}
-            </div>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" />
+                <YAxis stroke="hsl(var(--muted-foreground))" />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: "8px",
+                  }}
+                />
+                <Bar
+                  dataKey="value"
+                  fill="hsl(var(--primary))"
+                  radius={[8, 8, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
           )}
         </div>
-      </section>
 
-      {/* CTA Section */}
-      <section className="py-20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 via-transparent to-blue-500/10" />
-
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-              Ready to get started?
-            </h2>
-            <p className="text-lg text-muted-foreground mb-8">
-              Join thousands of developers building with LibraryX today. Deploy
-              your first array-based library in minutes.
-            </p>
-            <button className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold hover:shadow-lg hover:shadow-purple-500/30 transition-all">
-              Start Building
-              <ArrowRight className="w-5 h-5" />
-            </button>
+        {/* Recent Activity */}
+        <div className="card-hover p-6">
+          <h2 className="text-lg font-semibold mb-4">Recent Activity</h2>
+          <div className="space-y-3">
+            {recentActivity.map((activity) => (
+              <div
+                key={activity.id}
+                className="table-row-hover flex items-center justify-between p-3 border border-border rounded-lg"
+              >
+                <div className="flex-1">
+                  <p className="font-medium text-foreground">{activity.member}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {activity.action} "{activity.book}"
+                  </p>
+                </div>
+                <span className="text-sm text-muted-foreground">{activity.date}</span>
+              </div>
+            ))}
           </div>
         </div>
-      </section>
+      </div>
     </Layout>
   );
-}
+};
+
+export default Dashboard;
