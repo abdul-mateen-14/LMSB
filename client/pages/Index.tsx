@@ -7,7 +7,20 @@ import {
   TrendingUp,
   AlertCircle,
 } from "lucide-react";
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
 
 interface StatCard {
   label: string;
@@ -85,10 +98,34 @@ const Dashboard = () => {
   const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"];
 
   const recentActivity = [
-    { id: 1, member: "John Doe", action: "Borrowed", book: "The Great Gatsby", date: "2 hours ago" },
-    { id: 2, member: "Jane Smith", action: "Returned", book: "1984", date: "5 hours ago" },
-    { id: 3, member: "Mike Johnson", action: "Borrowed", book: "To Kill a Mockingbird", date: "1 day ago" },
-    { id: 4, member: "Sarah Williams", action: "Reserved", book: "Pride and Prejudice", date: "2 days ago" },
+    {
+      id: 1,
+      member: "John Doe",
+      action: "Borrowed",
+      book: "The Great Gatsby",
+      date: "2 hours ago",
+    },
+    {
+      id: 2,
+      member: "Jane Smith",
+      action: "Returned",
+      book: "1984",
+      date: "5 hours ago",
+    },
+    {
+      id: 3,
+      member: "Mike Johnson",
+      action: "Borrowed",
+      book: "To Kill a Mockingbird",
+      date: "1 day ago",
+    },
+    {
+      id: 4,
+      member: "Sarah Williams",
+      action: "Reserved",
+      book: "Pride and Prejudice",
+      date: "2 days ago",
+    },
   ];
 
   return (
@@ -97,7 +134,9 @@ const Dashboard = () => {
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-          <p className="text-muted-foreground mt-2">Welcome back! Here's your library overview.</p>
+          <p className="text-muted-foreground mt-2">
+            Welcome back! Here's your library overview.
+          </p>
         </div>
 
         {/* Stats Grid */}
@@ -111,7 +150,9 @@ const Dashboard = () => {
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 <div className="flex items-start justify-between mb-4">
-                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${stat.color}`}>
+                  <div
+                    className={`w-12 h-12 rounded-lg flex items-center justify-center ${stat.color}`}
+                  >
                     <Icon className="w-6 h-6" />
                   </div>
                   {stat.trend && (
@@ -120,8 +161,12 @@ const Dashboard = () => {
                     </div>
                   )}
                 </div>
-                <p className="text-muted-foreground text-sm mb-1">{stat.label}</p>
-                <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+                <p className="text-muted-foreground text-sm mb-1">
+                  {stat.label}
+                </p>
+                <p className="text-2xl font-bold text-foreground">
+                  {stat.value}
+                </p>
               </div>
             );
           })}
@@ -137,7 +182,10 @@ const Dashboard = () => {
             ) : (
               <ResponsiveContainer width="100%" height={250}>
                 <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="hsl(var(--border))"
+                  />
                   <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" />
                   <YAxis stroke="hsl(var(--muted-foreground))" />
                   <Tooltip
@@ -177,7 +225,10 @@ const Dashboard = () => {
                     dataKey="books"
                   >
                     {borrowData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
                     ))}
                   </Pie>
                   <Tooltip
@@ -201,7 +252,10 @@ const Dashboard = () => {
           ) : (
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="hsl(var(--border))"
+                />
                 <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" />
                 <YAxis stroke="hsl(var(--muted-foreground))" />
                 <Tooltip
@@ -231,12 +285,16 @@ const Dashboard = () => {
                 className="table-row-hover flex items-center justify-between p-3 border border-border rounded-lg"
               >
                 <div className="flex-1">
-                  <p className="font-medium text-foreground">{activity.member}</p>
+                  <p className="font-medium text-foreground">
+                    {activity.member}
+                  </p>
                   <p className="text-sm text-muted-foreground">
                     {activity.action} "{activity.book}"
                   </p>
                 </div>
-                <span className="text-sm text-muted-foreground">{activity.date}</span>
+                <span className="text-sm text-muted-foreground">
+                  {activity.date}
+                </span>
               </div>
             ))}
           </div>

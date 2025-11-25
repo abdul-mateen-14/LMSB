@@ -39,8 +39,9 @@ export default function Documentation() {
 
           <div className="py-12 text-center">
             <p className="text-muted-foreground mb-4">
-              This documentation section is currently being developed. Continue prompting to
-              add detailed guides, API references, and code examples.
+              This documentation section is currently being developed. Continue
+              prompting to add detailed guides, API references, and code
+              examples.
             </p>
           </div>
         </div>

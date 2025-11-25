@@ -74,7 +74,9 @@ export default function Layout({ children }: LayoutProps) {
                   title={!sidebarOpen ? item.label : ""}
                 >
                   <Icon className="w-5 h-5 flex-shrink-0" />
-                  {sidebarOpen && <span className="text-sm font-medium">{item.label}</span>}
+                  {sidebarOpen && (
+                    <span className="text-sm font-medium">{item.label}</span>
+                  )}
                 </Link>
               );
             })}
@@ -91,7 +93,9 @@ export default function Layout({ children }: LayoutProps) {
       </aside>
 
       {/* Main Content */}
-      <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"}`}>
+      <div
+        className={`flex-1 transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"}`}
+      >
         {/* Top Bar */}
         <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur">
           <div className="px-6 py-4 flex items-center justify-between">
@@ -120,9 +124,7 @@ export default function Layout({ children }: LayoutProps) {
         </header>
 
         {/* Page Content */}
-        <main className="p-6">
-          {children}
-        </main>
+        <main className="p-6">{children}</main>
       </div>
     </div>
   );

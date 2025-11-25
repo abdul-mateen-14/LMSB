@@ -34,8 +34,8 @@ export default function Libraries() {
 
           <div className="py-12 text-center">
             <p className="text-muted-foreground mb-4">
-              This page is currently being developed. Continue prompting to fill in the
-              complete libraries browsing interface.
+              This page is currently being developed. Continue prompting to fill
+              in the complete libraries browsing interface.
             </p>
           </div>
         </div>

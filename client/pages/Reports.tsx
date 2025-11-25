@@ -1,6 +1,19 @@
 import Layout from "@/components/Layout";
 import { useState } from "react";
-import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import { Download, Calendar } from "lucide-react";
 
 interface ReportData {
@@ -41,11 +54,31 @@ const ReportsPage = () => {
   ];
 
   const topBooks: TopBook[] = [
-    { title: "The Great Gatsby", author: "F. Scott Fitzgerald", borrows: 45, rating: 4.8 },
-    { title: "To Kill a Mockingbird", author: "Harper Lee", borrows: 42, rating: 4.9 },
+    {
+      title: "The Great Gatsby",
+      author: "F. Scott Fitzgerald",
+      borrows: 45,
+      rating: 4.8,
+    },
+    {
+      title: "To Kill a Mockingbird",
+      author: "Harper Lee",
+      borrows: 42,
+      rating: 4.9,
+    },
     { title: "1984", author: "George Orwell", borrows: 38, rating: 4.7 },
-    { title: "Pride and Prejudice", author: "Jane Austen", borrows: 35, rating: 4.6 },
-    { title: "The Catcher in the Rye", author: "J.D. Salinger", borrows: 31, rating: 4.5 },
+    {
+      title: "Pride and Prejudice",
+      author: "Jane Austen",
+      borrows: 35,
+      rating: 4.6,
+    },
+    {
+      title: "The Catcher in the Rye",
+      author: "J.D. Salinger",
+      borrows: 31,
+      rating: 4.5,
+    },
   ];
 
   const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"];
@@ -63,7 +96,9 @@ const ReportsPage = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Reports & Analytics</h1>
+            <h1 className="text-3xl font-bold text-foreground">
+              Reports & Analytics
+            </h1>
             <p className="text-muted-foreground mt-2">
               Library statistics and performance metrics
             </p>
@@ -89,12 +124,19 @@ const ReportsPage = () => {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((stat, index) => (
-            <div key={index} className="stat-card animate-slide-down"
-              style={{ animationDelay: `${index * 50}ms` }}>
+            <div
+              key={index}
+              className="stat-card animate-slide-down"
+              style={{ animationDelay: `${index * 50}ms` }}
+            >
               <p className="text-muted-foreground text-sm mb-1">{stat.label}</p>
               <div className="flex items-end justify-between">
-                <p className="text-2xl font-bold text-foreground">{stat.value}</p>
-                <span className="text-xs font-medium text-green-600">{stat.change}</span>
+                <p className="text-2xl font-bold text-foreground">
+                  {stat.value}
+                </p>
+                <span className="text-xs font-medium text-green-600">
+                  {stat.change}
+                </span>
               </div>
             </div>
           ))}
@@ -104,10 +146,15 @@ const ReportsPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Borrow vs Returns */}
           <div className="card-hover p-6">
-            <h2 className="text-lg font-semibold mb-4">Borrow vs Returns Trend</h2>
+            <h2 className="text-lg font-semibold mb-4">
+              Borrow vs Returns Trend
+            </h2>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={borrowTrendData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="hsl(var(--border))"
+                />
                 <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
                 <YAxis stroke="hsl(var(--muted-foreground))" />
                 <Tooltip
@@ -117,8 +164,16 @@ const ReportsPage = () => {
                     borderRadius: "8px",
                   }}
                 />
-                <Bar dataKey="borrows" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} />
-                <Bar dataKey="returns" fill="hsl(var(--muted))" radius={[8, 8, 0, 0]} />
+                <Bar
+                  dataKey="borrows"
+                  fill="hsl(var(--primary))"
+                  radius={[8, 8, 0, 0]}
+                />
+                <Bar
+                  dataKey="returns"
+                  fill="hsl(var(--muted))"
+                  radius={[8, 8, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -138,7 +193,10 @@ const ReportsPage = () => {
                   dataKey="value"
                 >
                   {categoryData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
                   ))}
                 </Pie>
                 <Tooltip
@@ -158,7 +216,10 @@ const ReportsPage = () => {
           <h2 className="text-lg font-semibold mb-4">Annual Borrowing Trend</h2>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={borrowTrendData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="hsl(var(--border))"
+              />
               <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
               <YAxis stroke="hsl(var(--muted-foreground))" />
               <Tooltip
@@ -211,7 +272,10 @@ const ReportsPage = () => {
               </thead>
               <tbody>
                 {topBooks.map((book, index) => (
-                  <tr key={index} className="table-row-hover border-b border-border/50">
+                  <tr
+                    key={index}
+                    className="table-row-hover border-b border-border/50"
+                  >
                     <td className="px-6 py-4 text-sm font-medium text-foreground">
                       <div className="flex items-center gap-2">
                         <span className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold">

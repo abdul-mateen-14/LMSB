@@ -29,7 +29,10 @@ const SettingsPage = () => {
 
   const [activeTab, setActiveTab] = useState("general");
 
-  const handleInputChange = (key: keyof Settings, value: string | number | boolean) => {
+  const handleInputChange = (
+    key: keyof Settings,
+    value: string | number | boolean,
+  ) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
   };
 
@@ -166,7 +169,10 @@ const SettingsPage = () => {
                       type="number"
                       value={settings.borrowLimit}
                       onChange={(e) =>
-                        handleInputChange("borrowLimit", parseInt(e.target.value))
+                        handleInputChange(
+                          "borrowLimit",
+                          parseInt(e.target.value),
+                        )
                       }
                       className="w-full px-4 py-2 rounded-lg border border-border bg-card focus:border-primary focus:outline-none transition-colors"
                     />
@@ -179,7 +185,10 @@ const SettingsPage = () => {
                       type="number"
                       value={settings.borrowDays}
                       onChange={(e) =>
-                        handleInputChange("borrowDays", parseInt(e.target.value))
+                        handleInputChange(
+                          "borrowDays",
+                          parseInt(e.target.value),
+                        )
                       }
                       className="w-full px-4 py-2 rounded-lg border border-border bg-card focus:border-primary focus:outline-none transition-colors"
                     />
@@ -193,7 +202,10 @@ const SettingsPage = () => {
                       step="0.01"
                       value={settings.lateFeePerDay}
                       onChange={(e) =>
-                        handleInputChange("lateFeePerDay", parseFloat(e.target.value))
+                        handleInputChange(
+                          "lateFeePerDay",
+                          parseFloat(e.target.value),
+                        )
                       }
                       className="w-full px-4 py-2 rounded-lg border border-border bg-card focus:border-primary focus:outline-none transition-colors"
                     />
@@ -274,9 +286,7 @@ const SettingsPage = () => {
                     className="w-4 h-4 rounded border-border cursor-pointer"
                   />
                   <div>
-                    <p className="font-medium text-foreground">
-                      Admin Alerts
-                    </p>
+                    <p className="font-medium text-foreground">Admin Alerts</p>
                     <p className="text-sm text-muted-foreground">
                       Receive alerts for overdue books and system events
                     </p>

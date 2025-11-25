@@ -14,7 +14,8 @@ export default function NotFound() {
           </div>
 
           <p className="text-muted-foreground mb-6">
-            The page you're looking for doesn't exist. It might have been moved or deleted.
+            The page you're looking for doesn't exist. It might have been moved
+            or deleted.
           </p>
 
           <Link to="/" className="btn-primary inline-block">

@@ -218,10 +218,11 @@ const MembersPage = () => {
                 </div>
                 <span
                   className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(
-                    member.status
+                    member.status,
                   )}`}
                 >
-                  {member.status.charAt(0).toUpperCase() + member.status.slice(1)}
+                  {member.status.charAt(0).toUpperCase() +
+                    member.status.slice(1)}
                 </span>
               </div>
 
@@ -238,13 +239,17 @@ const MembersPage = () => {
 
               <div className="grid grid-cols-2 gap-4 py-4 border-t border-border mb-4">
                 <div>
-                  <p className="text-xs text-muted-foreground">Currently Borrowed</p>
+                  <p className="text-xs text-muted-foreground">
+                    Currently Borrowed
+                  </p>
                   <p className="text-lg font-bold text-foreground">
                     {member.borrowedBooks}
                   </p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Total Borrowed</p>
+                  <p className="text-xs text-muted-foreground">
+                    Total Borrowed
+                  </p>
                   <p className="text-lg font-bold text-foreground">
                     {member.totalBorrowed}
                   </p>

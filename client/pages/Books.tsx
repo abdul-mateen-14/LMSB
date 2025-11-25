@@ -1,6 +1,14 @@
 import Layout from "@/components/Layout";
 import { useState } from "react";
-import { Search, Plus, Edit2, Trash2, Filter, ChevronUp, ChevronDown } from "lucide-react";
+import {
+  Search,
+  Plus,
+  Edit2,
+  Trash2,
+  Filter,
+  ChevronUp,
+  ChevronDown,
+} from "lucide-react";
 
 interface Book {
   id: string;
@@ -18,7 +26,9 @@ const BooksPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   const [isAddingBook, setIsAddingBook] = useState(false);
-  const [sortBy, setSortBy] = useState<"title" | "author" | "category">("title");
+  const [sortBy, setSortBy] = useState<"title" | "author" | "category">(
+    "title",
+  );
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   const books: Book[] = [
@@ -299,14 +309,14 @@ const BooksPage = () => {
                     <td className="px-6 py-4 text-sm">
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(
-                          book.status
+                          book.status,
                         )}`}
                       >
                         {book.status === "out-of-stock"
                           ? "Out of Stock"
                           : book.status === "low-stock"
-                          ? "Low Stock"
-                          : "Available"}
+                            ? "Low Stock"
+                            : "Available"}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm">

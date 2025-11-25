@@ -280,7 +280,7 @@ const BorrowingPage = () => {
                         {getStatusIcon(record.status)}
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(
-                            record.status
+                            record.status,
                           )}`}
                         >
                           {record.status.charAt(0).toUpperCase() +
@@ -301,7 +301,8 @@ const BorrowingPage = () => {
                       )}
                       {record.status === "returned" && (
                         <span className="text-xs text-muted-foreground">
-                          Returned {new Date(record.returnDate!).toLocaleDateString()}
+                          Returned{" "}
+                          {new Date(record.returnDate!).toLocaleDateString()}
                         </span>
                       )}
                     </td>
