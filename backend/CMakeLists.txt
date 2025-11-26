@@ -7,16 +7,20 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Find required packages
 find_package(MySQL REQUIRED)
 find_package(nlohmann_json 3.2.0 QUIET)
+find_package(Boost REQUIRED COMPONENTS system)
 
-# If nlohmann_json is not found, we'll use it as header-only
-if(NOT nlohmann_json_FOUND)
-    message(STATUS "nlohmann_json not found, using header-only version")
-endif()
-
-# Include directories
+# Include directories for header-only libraries
 include_directories(${MYSQL_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/third_party)
+include_directories(${Boost_INCLUDE_DIRS})
+
+# nlohmann_json header
+if(NOT nlohmann_json_FOUND)
+    message(STATUS "nlohmann_json not found, using header-only version")
+    # Assume it's in third_party or will be installed via package manager
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/third_party/nlohmann)
+endif()
 
 # Main executable
 add_executable(library_server 
@@ -35,6 +39,7 @@ add_executable(library_server
 # Link libraries
 target_link_libraries(library_server 
     ${MYSQL_LIBRARIES}
+    ${Boost_LIBRARIES}
     pthread
 )
 
@@ -45,6 +50,7 @@ else()
     target_compile_options(library_server PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
-# Find Boost (required by Crow)
-find_package(Boost REQUIRED)
-target_include_directories(library_server PRIVATE ${Boost_INCLUDE_DIR})
+# Add nlohmann_json if found
+if(nlohmann_json_FOUND)
+    target_link_libraries(library_server nlohmann_json::nlohmann_json)
+endif()
