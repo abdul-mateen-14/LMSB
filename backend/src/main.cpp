@@ -1,23 +1,20 @@
 #include "crow_all.h"
 #include "database/db_connection.h"
 #include "routes/books_routes.h"
-#include "models/borrow.h"
+#include "routes/members_routes.h"
+#include "routes/borrowing_routes.h"
+#include "routes/reports_routes.h"
+#include "routes/settings_routes.h"
 #include <iostream>
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
-// Forward declarations for route registration
-void registerBooksRoutes(crow::SimpleApp& app, Database& db);
-void registerMembersRoutes(crow::SimpleApp& app, Database& db);
-void registerBorrowingRoutes(crow::SimpleApp& app, Database& db);
-void registerReportsRoutes(crow::SimpleApp& app, Database& db);
-void registerSettingsRoutes(crow::SimpleApp& app, Database& db);
-
 int main() {
     crow::SimpleApp app;
     
     // Database connection
+    // Update these credentials to match your MySQL setup
     Database db("localhost", "root", "password", "library_db", 3306);
     
     if (!db.connect()) {
@@ -58,6 +55,8 @@ int main() {
         response.set_header("Access-Control-Allow-Headers", "Content-Type");
         return response;
     });
+    
+    std::cout << "Starting server on http://localhost:8080" << std::endl;
     
     // Start server
     app.port(8080).multithreaded().run();
