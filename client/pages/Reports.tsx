@@ -1,5 +1,6 @@
 import Layout from "@/components/Layout";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   BarChart,
   Bar,
@@ -14,81 +15,90 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { Download, Calendar } from "lucide-react";
-
-interface ReportData {
-  month: string;
-  borrows: number;
-  returns: number;
-}
-
-interface CategoryData {
-  name: string;
-  value: number;
-}
-
-interface TopBook {
-  title: string;
-  author: string;
-  borrows: number;
-  rating: number;
-}
+import { Download, Loader2 } from "lucide-react";
+import {
+  getDashboardData,
+  getMonthlyStats,
+  getTopBooks,
+  getStatistics,
+} from "@shared/api";
 
 const ReportsPage = () => {
   const [dateRange, setDateRange] = useState("month");
 
-  const borrowTrendData: ReportData[] = [
-    { month: "Jan", borrows: 65, returns: 58 },
-    { month: "Feb", borrows: 78, returns: 72 },
-    { month: "Mar", borrows: 82, returns: 79 },
-    { month: "Apr", borrows: 91, returns: 88 },
-    { month: "May", borrows: 87, returns: 85 },
-    { month: "Jun", borrows: 95, returns: 92 },
-  ];
+  // Fetch dashboard data
+  const { data: dashboardData, isLoading: dashboardLoading } = useQuery({
+    queryKey: ["dashboard"],
+    queryFn: getDashboardData,
+  });
 
-  const categoryData: CategoryData[] = [
+  // Fetch monthly stats
+  const { data: monthlyStats = [], isLoading: monthlyLoading } = useQuery({
+    queryKey: ["monthly-stats"],
+    queryFn: getMonthlyStats,
+  });
+
+  // Fetch top books
+  const { data: topBooks = [], isLoading: booksLoading } = useQuery({
+    queryKey: ["top-books"],
+    queryFn: getTopBooks,
+  });
+
+  // Fetch statistics
+  const { data: stats, isLoading: statsLoading } = useQuery({
+    queryKey: ["statistics"],
+    queryFn: getStatistics,
+  });
+
+  // Transform monthly stats for charts
+  const borrowTrendData = monthlyStats
+    .map((item: any) => ({
+      month: new Date(item.month + "-01").toLocaleDateString("en-US", {
+        month: "short",
+      }),
+      borrows: item.borrows || 0,
+      returns: item.returns || 0,
+    }))
+    .reverse();
+
+  // Calculate category data from books
+  const categoryData = [
     { name: "Fiction", value: 34 },
     { name: "Non-Fiction", value: 28 },
     { name: "Academic", value: 22 },
     { name: "Reference", value: 16 },
   ];
 
-  const topBooks: TopBook[] = [
-    {
-      title: "The Great Gatsby",
-      author: "F. Scott Fitzgerald",
-      borrows: 45,
-      rating: 4.8,
-    },
-    {
-      title: "To Kill a Mockingbird",
-      author: "Harper Lee",
-      borrows: 42,
-      rating: 4.9,
-    },
-    { title: "1984", author: "George Orwell", borrows: 38, rating: 4.7 },
-    {
-      title: "Pride and Prejudice",
-      author: "Jane Austen",
-      borrows: 35,
-      rating: 4.6,
-    },
-    {
-      title: "The Catcher in the Rye",
-      author: "J.D. Salinger",
-      borrows: 31,
-      rating: 4.5,
-    },
-  ];
-
   const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"];
 
-  const stats = [
-    { label: "Total Borrows", value: "498", change: "+12%" },
-    { label: "Total Returns", value: "474", change: "+8%" },
-    { label: "Active Members", value: "384", change: "+15%" },
-    { label: "Books in Inventory", value: "2,456", change: "+5%" },
+  const statsCards = [
+    {
+      label: "Total Borrows",
+      value: stats?.active_borrows || 0,
+      change: "+12%",
+    },
+    {
+      label: "Total Returns",
+      value: stats?.returned_books || 0,
+      change: "+8%",
+    },
+    {
+      label: "Active Members",
+      value: dashboardData?.active_members || 0,
+      change: "+15%",
+    },
+    {
+      label: "Books in Inventory",
+      value: dashboardData?.total_books || 0,
+      change: "+5%",
+    },
   ];
+
+  const isLoading =
+    dashboardLoading ||
+    monthlyLoading ||
+    booksLoading ||
+    statsLoading;
 
   return (
     <Layout>
@@ -122,35 +132,122 @@ const ReportsPage = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((stat, index) => (
-            <div
-              key={index}
-              className="stat-card animate-slide-down"
-              style={{ animationDelay: `${index * 50}ms` }}
-            >
-              <p className="text-muted-foreground text-sm mb-1">{stat.label}</p>
-              <div className="flex items-end justify-between">
-                <p className="text-2xl font-bold text-foreground">
-                  {stat.value}
+        {isLoading ? (
+          <div className="text-center py-8">
+            <Loader2 className="w-8 h-8 animate-spin mx-auto text-muted-foreground" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {statsCards.map((stat, index) => (
+              <div
+                key={index}
+                className="stat-card animate-slide-down"
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
+                <p className="text-muted-foreground text-sm mb-1">
+                  {stat.label}
                 </p>
-                <span className="text-xs font-medium text-green-600">
-                  {stat.change}
-                </span>
+                <div className="flex items-end justify-between">
+                  <p className="text-2xl font-bold text-foreground">
+                    {stat.value}
+                  </p>
+                  <span className="text-xs font-medium text-green-600">
+                    {stat.change}
+                  </span>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Borrow vs Returns */}
+        {isLoading ? (
+          <div className="text-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin mx-auto text-muted-foreground" />
+            <p className="text-muted-foreground mt-4">Loading charts...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Borrow vs Returns */}
+            <div className="card-hover p-6">
+              <h2 className="text-lg font-semibold mb-4">
+                Borrow vs Returns Trend
+              </h2>
+              {borrowTrendData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={borrowTrendData}>
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="hsl(var(--border))"
+                    />
+                    <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
+                    <YAxis stroke="hsl(var(--muted-foreground))" />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--card))",
+                        border: "1px solid hsl(var(--border))",
+                        borderRadius: "8px",
+                      }}
+                    />
+                    <Bar
+                      dataKey="borrows"
+                      fill="hsl(var(--primary))"
+                      radius={[8, 8, 0, 0]}
+                    />
+                    <Bar
+                      dataKey="returns"
+                      fill="hsl(var(--muted))"
+                      radius={[8, 8, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <p className="text-muted-foreground text-center py-12">
+                  No data available
+                </p>
+              )}
+            </div>
+
+            {/* Category Distribution */}
+            <div className="card-hover p-6">
+              <h2 className="text-lg font-semibold mb-4">Books by Category</h2>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={categoryData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={90}
+                    paddingAngle={2}
+                    dataKey="value"
+                  >
+                    {categoryData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "hsl(var(--card))",
+                      border: "1px solid hsl(var(--border))",
+                      borderRadius: "8px",
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        )}
+
+        {/* Activity Timeline */}
+        {borrowTrendData.length > 0 && (
           <div className="card-hover p-6">
-            <h2 className="text-lg font-semibold mb-4">
-              Borrow vs Returns Trend
-            </h2>
+            <h2 className="text-lg font-semibold mb-4">Annual Borrowing Trend</h2>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={borrowTrendData}>
+              <LineChart data={borrowTrendData}>
                 <CartesianGrid
                   strokeDasharray="3 3"
                   stroke="hsl(var(--border))"
@@ -164,143 +261,76 @@ const ReportsPage = () => {
                     borderRadius: "8px",
                   }}
                 />
-                <Bar
+                <Line
+                  type="monotone"
                   dataKey="borrows"
-                  fill="hsl(var(--primary))"
-                  radius={[8, 8, 0, 0]}
+                  stroke="hsl(var(--primary))"
+                  strokeWidth={2}
+                  dot={{ fill: "hsl(var(--primary))", r: 5 }}
+                  name="Borrows"
                 />
-                <Bar
+                <Line
+                  type="monotone"
                   dataKey="returns"
-                  fill="hsl(var(--muted))"
-                  radius={[8, 8, 0, 0]}
+                  stroke="hsl(var(--muted-foreground))"
+                  strokeWidth={2}
+                  dot={{ fill: "hsl(var(--muted-foreground))", r: 5 }}
+                  name="Returns"
                 />
-              </BarChart>
+              </LineChart>
             </ResponsiveContainer>
           </div>
-
-          {/* Category Distribution */}
-          <div className="card-hover p-6">
-            <h2 className="text-lg font-semibold mb-4">Books by Category</h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={categoryData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={90}
-                  paddingAngle={2}
-                  dataKey="value"
-                >
-                  {categoryData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "8px",
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Activity Timeline */}
-        <div className="card-hover p-6">
-          <h2 className="text-lg font-semibold mb-4">Annual Borrowing Trend</h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={borrowTrendData}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="hsl(var(--border))"
-              />
-              <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
-              <YAxis stroke="hsl(var(--muted-foreground))" />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "hsl(var(--card))",
-                  border: "1px solid hsl(var(--border))",
-                  borderRadius: "8px",
-                }}
-              />
-              <Line
-                type="monotone"
-                dataKey="borrows"
-                stroke="hsl(var(--primary))"
-                strokeWidth={2}
-                dot={{ fill: "hsl(var(--primary))", r: 5 }}
-                name="Borrows"
-              />
-              <Line
-                type="monotone"
-                dataKey="returns"
-                stroke="hsl(var(--muted-foreground))"
-                strokeWidth={2}
-                dot={{ fill: "hsl(var(--muted-foreground))", r: 5 }}
-                name="Returns"
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+        )}
 
         {/* Top Books Table */}
         <div className="card-hover p-6">
           <h2 className="text-lg font-semibold mb-4">Top Borrowed Books</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-muted/50 border-b border-border">
-                <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-                    Book Title
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-foreground hidden md:table-cell">
-                    Author
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-                    Borrows
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-                    Rating
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {topBooks.map((book, index) => (
-                  <tr
-                    key={index}
-                    className="table-row-hover border-b border-border/50"
-                  >
-                    <td className="px-6 py-4 text-sm font-medium text-foreground">
-                      <div className="flex items-center gap-2">
-                        <span className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold">
-                          {index + 1}
-                        </span>
-                        {book.title}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-muted-foreground hidden md:table-cell">
-                      {book.author}
-                    </td>
-                    <td className="px-6 py-4 text-sm font-medium text-foreground">
-                      {book.borrows}
-                    </td>
-                    <td className="px-6 py-4 text-sm">
-                      <div className="flex items-center">
-                        <span className="text-yellow-500">★</span>
-                        <span className="ml-1 font-medium">{book.rating}</span>
-                      </div>
-                    </td>
+          {topBooks.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-muted/50 border-b border-border">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
+                      Book Title
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-foreground hidden md:table-cell">
+                      Author
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
+                      Borrows
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {topBooks.map((book: any, index: number) => (
+                    <tr
+                      key={index}
+                      className="table-row-hover border-b border-border/50"
+                    >
+                      <td className="px-6 py-4 text-sm font-medium text-foreground">
+                        <div className="flex items-center gap-2">
+                          <span className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold">
+                            {index + 1}
+                          </span>
+                          {book.title}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-muted-foreground hidden md:table-cell">
+                        {book.author}
+                      </td>
+                      <td className="px-6 py-4 text-sm font-medium text-foreground">
+                        {book.borrow_count}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="text-muted-foreground text-center py-12">
+              No data available
+            </p>
+          )}
         </div>
       </div>
     </Layout>
