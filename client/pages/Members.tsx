@@ -1,101 +1,101 @@
 import Layout from "@/components/Layout";
 import { useState } from "react";
-import { Search, Plus, Edit2, Trash2, Mail, Phone, MapPin } from "lucide-react";
-
-interface Member {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  memberId: string;
-  joinDate: string;
-  status: "active" | "inactive" | "suspended";
-  borrowedBooks: number;
-  totalBorrowed: number;
-}
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  Search,
+  Plus,
+  Edit2,
+  Trash2,
+  Mail,
+  Phone,
+  MapPin,
+  Loader2,
+} from "lucide-react";
+import {
+  Member,
+  MemberCreateRequest,
+  getMembers,
+  getMembersByStatus,
+  createMember,
+  deleteMember,
+} from "@shared/api";
+import { useToast } from "@/hooks/use-toast";
 
 const MembersPage = () => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [isAddingMember, setIsAddingMember] = useState(false);
+  const [formData, setFormData] = useState({
+    member_id: "",
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+  });
 
-  const members: Member[] = [
-    {
-      id: "1",
-      name: "John Doe",
-      email: "john@example.com",
-      phone: "+1-555-0123",
-      memberId: "LIB001",
-      joinDate: "2023-01-15",
-      status: "active",
-      borrowedBooks: 3,
-      totalBorrowed: 24,
-    },
-    {
-      id: "2",
-      name: "Jane Smith",
-      email: "jane@example.com",
-      phone: "+1-555-0124",
-      memberId: "LIB002",
-      joinDate: "2023-02-20",
-      status: "active",
-      borrowedBooks: 1,
-      totalBorrowed: 18,
-    },
-    {
-      id: "3",
-      name: "Mike Johnson",
-      email: "mike@example.com",
-      phone: "+1-555-0125",
-      memberId: "LIB003",
-      joinDate: "2023-03-10",
-      status: "active",
-      borrowedBooks: 5,
-      totalBorrowed: 32,
-    },
-    {
-      id: "4",
-      name: "Sarah Williams",
-      email: "sarah@example.com",
-      phone: "+1-555-0126",
-      memberId: "LIB004",
-      joinDate: "2022-11-05",
-      status: "inactive",
-      borrowedBooks: 0,
-      totalBorrowed: 15,
-    },
-    {
-      id: "5",
-      name: "Robert Brown",
-      email: "robert@example.com",
-      phone: "+1-555-0127",
-      memberId: "LIB005",
-      joinDate: "2023-04-22",
-      status: "suspended",
-      borrowedBooks: 2,
-      totalBorrowed: 8,
-    },
-    {
-      id: "6",
-      name: "Emily Davis",
-      email: "emily@example.com",
-      phone: "+1-555-0128",
-      memberId: "LIB006",
-      joinDate: "2023-05-30",
-      status: "active",
-      borrowedBooks: 2,
-      totalBorrowed: 12,
-    },
-  ];
+  // Fetch members
+  const { data: members = [], isLoading, error } = useQuery({
+    queryKey: ["members", filterStatus],
+    queryFn: () =>
+      filterStatus === "all"
+        ? getMembers()
+        : getMembersByStatus(filterStatus),
+  });
 
-  const filteredMembers = members.filter((member) => {
+  // Create member mutation
+  const createMutation = useMutation({
+    mutationFn: (data: MemberCreateRequest) => createMember(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["members"] });
+      setIsAddingMember(false);
+      setFormData({
+        member_id: "",
+        name: "",
+        email: "",
+        phone: "",
+        address: "",
+      });
+      toast({
+        title: "Success",
+        description: "Member added successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to add member",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete member mutation
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => deleteMember(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["members"] });
+      toast({
+        title: "Success",
+        description: "Member deleted successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete member",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const filteredMembers = members.filter((member: Member) => {
     const matchesSearch =
       member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      member.memberId.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus =
-      filterStatus === "all" || member.status === filterStatus;
-    return matchesSearch && matchesStatus;
+      member.member_id.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesSearch;
   });
 
   const getStatusBadge = (status: string) => {
@@ -106,6 +106,21 @@ const MembersPage = () => {
     };
     return styles[status] || "bg-gray-500/10 text-gray-700";
   };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    createMutation.mutate(formData);
+  };
+
+  if (error) {
+    return (
+      <Layout>
+        <div className="text-center py-12">
+          <p className="text-destructive">Failed to load members</p>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -155,40 +170,64 @@ const MembersPage = () => {
         {isAddingMember && (
           <div className="card-hover p-6 bg-muted/30 border-primary/30">
             <h2 className="text-lg font-semibold mb-4">Add New Member</h2>
-            <form className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <input
                 type="text"
                 placeholder="Full Name"
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                required
                 className="px-4 py-2 rounded-lg border border-border bg-card focus:border-primary focus:outline-none"
               />
               <input
                 type="email"
                 placeholder="Email"
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                required
                 className="px-4 py-2 rounded-lg border border-border bg-card focus:border-primary focus:outline-none"
               />
               <input
                 type="tel"
                 placeholder="Phone"
+                value={formData.phone}
+                onChange={(e) =>
+                  setFormData({ ...formData, phone: e.target.value })
+                }
                 className="px-4 py-2 rounded-lg border border-border bg-card focus:border-primary focus:outline-none"
               />
               <input
                 type="text"
                 placeholder="Member ID"
+                value={formData.member_id}
+                onChange={(e) =>
+                  setFormData({ ...formData, member_id: e.target.value })
+                }
+                required
                 className="px-4 py-2 rounded-lg border border-border bg-card focus:border-primary focus:outline-none"
               />
               <input
                 type="text"
                 placeholder="Address"
-                className="px-4 py-2 rounded-lg border border-border bg-card focus:border-primary focus:outline-none"
+                value={formData.address}
+                onChange={(e) =>
+                  setFormData({ ...formData, address: e.target.value })
+                }
+                className="px-4 py-2 rounded-lg border border-border bg-card focus:border-primary focus:outline-none col-span-2"
               />
-              <select className="px-4 py-2 rounded-lg border border-border bg-card focus:border-primary focus:outline-none">
-                <option>Select Status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-                <option value="suspended">Suspended</option>
-              </select>
               <div className="sm:col-span-2 flex gap-2">
-                <button type="submit" className="btn-primary flex-1">
+                <button
+                  type="submit"
+                  disabled={createMutation.isPending}
+                  className="btn-primary flex-1 disabled:opacity-50"
+                >
+                  {createMutation.isPending ? (
+                    <Loader2 className="w-4 h-4 inline mr-2 animate-spin" />
+                  ) : null}
                   Save Member
                 </button>
                 <button
@@ -204,74 +243,74 @@ const MembersPage = () => {
         )}
 
         {/* Members Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredMembers.map((member) => (
-            <div key={member.id} className="card-hover p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-foreground">
-                    {member.name}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    {member.memberId}
-                  </p>
+        {isLoading ? (
+          <div className="text-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin mx-auto text-muted-foreground" />
+            <p className="text-muted-foreground mt-4">Loading members...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredMembers.map((member: Member) => (
+              <div key={member.id} className="card-hover p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground">
+                      {member.name}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      {member.member_id}
+                    </p>
+                  </div>
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(
+                      member.status
+                    )}`}
+                  >
+                    {member.status.charAt(0).toUpperCase() +
+                      member.status.slice(1)}
+                  </span>
                 </div>
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(
-                    member.status,
-                  )}`}
-                >
-                  {member.status.charAt(0).toUpperCase() +
-                    member.status.slice(1)}
-                </span>
-              </div>
 
-              <div className="space-y-2 mb-4 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
-                  <span>{member.email}</span>
+                <div className="space-y-2 mb-4 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <Mail className="w-4 h-4" />
+                    <span>{member.email}</span>
+                  </div>
+                  {member.phone && (
+                    <div className="flex items-center gap-2">
+                      <Phone className="w-4 h-4" />
+                      <span>{member.phone}</span>
+                    </div>
+                  )}
                 </div>
-                <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4" />
-                  <span>{member.phone}</span>
-                </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-4 py-4 border-t border-border mb-4">
-                <div>
+                <div className="py-4 border-t border-border mb-4">
                   <p className="text-xs text-muted-foreground">
-                    Currently Borrowed
-                  </p>
-                  <p className="text-lg font-bold text-foreground">
-                    {member.borrowedBooks}
+                    Joined: {new Date(member.join_date).toLocaleDateString()}
                   </p>
                 </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">
-                    Total Borrowed
-                  </p>
-                  <p className="text-lg font-bold text-foreground">
-                    {member.totalBorrowed}
-                  </p>
-                </div>
-              </div>
 
-              <div className="flex gap-2">
-                <button className="flex-1 p-2 hover:bg-muted rounded-lg transition-colors flex items-center justify-center gap-2">
-                  <Edit2 className="w-4 h-4 text-primary" />
-                  <span className="text-sm">Edit</span>
-                </button>
-                <button className="flex-1 p-2 hover:bg-muted rounded-lg transition-colors flex items-center justify-center gap-2">
-                  <Trash2 className="w-4 h-4 text-destructive" />
-                  <span className="text-sm">Delete</span>
-                </button>
+                <div className="flex gap-2">
+                  <button className="flex-1 p-2 hover:bg-muted rounded-lg transition-colors flex items-center justify-center gap-2">
+                    <Edit2 className="w-4 h-4 text-primary" />
+                    <span className="text-sm">Edit</span>
+                  </button>
+                  <button
+                    onClick={() => deleteMutation.mutate(member.id)}
+                    disabled={deleteMutation.isPending}
+                    className="flex-1 p-2 hover:bg-muted rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    <Trash2 className="w-4 h-4 text-destructive" />
+                    <span className="text-sm">Delete</span>
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* Empty State */}
-        {filteredMembers.length === 0 && (
+        {!isLoading && filteredMembers.length === 0 && (
           <div className="text-center py-12 card-hover">
             <MapPin className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
             <p className="text-muted-foreground">No members found</p>
