@@ -1,11 +1,11 @@
 import Layout from "@/components/Layout";
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   BookOpen,
   Users,
   RotateCcw,
-  TrendingUp,
   AlertCircle,
+  Loader2,
 } from "lucide-react";
 import {
   LineChart,
@@ -21,74 +21,51 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import {
+  getDashboardData,
+  getMonthlyStats,
+  getBorrowRecords,
+} from "@shared/api";
 
 interface StatCard {
   label: string;
-  value: string;
+  value: string | number;
   icon: React.ComponentType<{ className?: string }>;
   trend?: string;
   color: string;
 }
 
-interface ChartDataPoint {
-  name: string;
-  value: number;
-}
-
-interface BorrowData {
-  name: string;
-  books: number;
-}
-
 const Dashboard = () => {
-  const [isLoading, setIsLoading] = useState(true);
+  // Fetch dashboard data
+  const { data: dashboardData, isLoading: dashboardLoading } = useQuery({
+    queryKey: ["dashboard"],
+    queryFn: getDashboardData,
+  });
 
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 500);
-    return () => clearTimeout(timer);
-  }, []);
+  // Fetch monthly stats
+  const { data: monthlyStats = [], isLoading: monthlyLoading } = useQuery({
+    queryKey: ["monthly-stats"],
+    queryFn: getMonthlyStats,
+  });
 
-  const stats: StatCard[] = [
-    {
-      label: "Total Books",
-      value: "2,456",
-      icon: BookOpen,
-      trend: "+12% this month",
-      color: "bg-blue-500/10 text-blue-600",
-    },
-    {
-      label: "Active Members",
-      value: "384",
-      icon: Users,
-      trend: "+8% this month",
-      color: "bg-green-500/10 text-green-600",
-    },
-    {
-      label: "Books Borrowed",
-      value: "147",
-      icon: RotateCcw,
-      trend: "This month",
-      color: "bg-orange-500/10 text-orange-600",
-    },
-    {
-      label: "Overdue Books",
-      value: "12",
-      icon: AlertCircle,
-      trend: "Needs attention",
-      color: "bg-red-500/10 text-red-600",
-    },
-  ];
+  // Fetch recent borrowing records
+  const { data: borrowRecords = [] } = useQuery({
+    queryKey: ["borrowing"],
+    queryFn: getBorrowRecords,
+  });
 
-  const chartData: ChartDataPoint[] = [
-    { name: "Jan", value: 65 },
-    { name: "Feb", value: 78 },
-    { name: "Mar", value: 82 },
-    { name: "Apr", value: 91 },
-    { name: "May", value: 87 },
-    { name: "Jun", value: 95 },
-  ];
+  // Transform monthly stats for charts
+  const chartData = monthlyStats
+    .map((item: any) => ({
+      name: new Date(item.month + "-01").toLocaleDateString("en-US", {
+        month: "short",
+      }),
+      value: item.borrows || 0,
+    }))
+    .reverse()
+    .slice(-6);
 
-  const borrowData: BorrowData[] = [
+  const borrowData = [
     { name: "Fiction", books: 234 },
     { name: "Non-Fiction", books: 189 },
     { name: "Academic", books: 167 },
@@ -97,36 +74,49 @@ const Dashboard = () => {
 
   const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"];
 
-  const recentActivity = [
+  const stats: StatCard[] = [
     {
-      id: 1,
-      member: "John Doe",
-      action: "Borrowed",
-      book: "The Great Gatsby",
-      date: "2 hours ago",
+      label: "Total Books",
+      value: dashboardData?.total_books || 0,
+      icon: BookOpen,
+      trend: "+12% this month",
+      color: "bg-blue-500/10 text-blue-600",
     },
     {
-      id: 2,
-      member: "Jane Smith",
-      action: "Returned",
-      book: "1984",
-      date: "5 hours ago",
+      label: "Active Members",
+      value: dashboardData?.active_members || 0,
+      icon: Users,
+      trend: "+8% this month",
+      color: "bg-green-500/10 text-green-600",
     },
     {
-      id: 3,
-      member: "Mike Johnson",
-      action: "Borrowed",
-      book: "To Kill a Mockingbird",
-      date: "1 day ago",
+      label: "Books Borrowed",
+      value: dashboardData?.books_borrowed || 0,
+      icon: RotateCcw,
+      trend: "This month",
+      color: "bg-orange-500/10 text-orange-600",
     },
     {
-      id: 4,
-      member: "Sarah Williams",
-      action: "Reserved",
-      book: "Pride and Prejudice",
-      date: "2 days ago",
+      label: "Overdue Books",
+      value: dashboardData?.overdue_books || 0,
+      icon: AlertCircle,
+      trend: "Needs attention",
+      color: "bg-red-500/10 text-red-600",
     },
   ];
+
+  const isLoading = dashboardLoading || monthlyLoading;
+
+  // Get recent activities from borrow records
+  const recentActivity = borrowRecords
+    .slice(0, 4)
+    .map((record: any, index: number) => ({
+      id: index + 1,
+      member: record.member_name,
+      action: record.status === "returned" ? "Returned" : "Borrowed",
+      book: record.book_title,
+      date: new Date(record.borrow_date).toLocaleDateString(),
+    }));
 
   return (
     <Layout>
@@ -140,37 +130,49 @@ const Dashboard = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((stat, index) => {
-            const Icon = stat.icon;
-            return (
-              <div
-                key={index}
-                className="stat-card animate-slide-down"
-                style={{ animationDelay: `${index * 50}ms` }}
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div
-                    className={`w-12 h-12 rounded-lg flex items-center justify-center ${stat.color}`}
-                  >
-                    <Icon className="w-6 h-6" />
-                  </div>
-                  {stat.trend && (
-                    <div className="text-xs font-medium text-green-600 bg-green-500/10 px-2 py-1 rounded">
-                      {stat.trend}
-                    </div>
-                  )}
-                </div>
-                <p className="text-muted-foreground text-sm mb-1">
-                  {stat.label}
-                </p>
-                <p className="text-2xl font-bold text-foreground">
-                  {stat.value}
-                </p>
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="stat-card animate-pulse">
+                <div className="h-12 w-12 bg-muted rounded-lg mb-4" />
+                <div className="h-4 bg-muted rounded w-20 mb-2" />
+                <div className="h-8 bg-muted rounded w-32" />
               </div>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {stats.map((stat, index) => {
+              const Icon = stat.icon;
+              return (
+                <div
+                  key={index}
+                  className="stat-card animate-slide-down"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div
+                      className={`w-12 h-12 rounded-lg flex items-center justify-center ${stat.color}`}
+                    >
+                      <Icon className="w-6 h-6" />
+                    </div>
+                    {stat.trend && (
+                      <div className="text-xs font-medium text-green-600 bg-green-500/10 px-2 py-1 rounded">
+                        {stat.trend}
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-muted-foreground text-sm mb-1">
+                    {stat.label}
+                  </p>
+                  <p className="text-2xl font-bold text-foreground">
+                    {stat.value}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -178,8 +180,10 @@ const Dashboard = () => {
           <div className="card-hover p-6">
             <h2 className="text-lg font-semibold mb-4">Borrowing Trend</h2>
             {isLoading ? (
-              <div className="h-64 bg-muted/30 rounded-lg animate-pulse" />
-            ) : (
+              <div className="h-64 bg-muted/30 rounded-lg flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+              </div>
+            ) : chartData.length > 0 ? (
               <ResponsiveContainer width="100%" height={250}>
                 <LineChart data={chartData}>
                   <CartesianGrid
@@ -204,6 +208,10 @@ const Dashboard = () => {
                   />
                 </LineChart>
               </ResponsiveContainer>
+            ) : (
+              <div className="h-64 bg-muted/30 rounded-lg flex items-center justify-center">
+                <p className="text-muted-foreground">No data available</p>
+              </div>
             )}
           </div>
 
@@ -211,7 +219,9 @@ const Dashboard = () => {
           <div className="card-hover p-6">
             <h2 className="text-lg font-semibold mb-4">Books by Category</h2>
             {isLoading ? (
-              <div className="h-64 bg-muted/30 rounded-lg animate-pulse" />
+              <div className="h-64 bg-muted/30 rounded-lg flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+              </div>
             ) : (
               <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
@@ -248,8 +258,10 @@ const Dashboard = () => {
         <div className="card-hover p-6">
           <h2 className="text-lg font-semibold mb-4">Monthly Activity</h2>
           {isLoading ? (
-            <div className="h-64 bg-muted/30 rounded-lg animate-pulse" />
-          ) : (
+            <div className="h-64 bg-muted/30 rounded-lg flex items-center justify-center">
+              <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : chartData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={chartData}>
                 <CartesianGrid
@@ -272,32 +284,48 @@ const Dashboard = () => {
                 />
               </BarChart>
             </ResponsiveContainer>
+          ) : (
+            <div className="h-64 bg-muted/30 rounded-lg flex items-center justify-center">
+              <p className="text-muted-foreground">No data available</p>
+            </div>
           )}
         </div>
 
         {/* Recent Activity */}
         <div className="card-hover p-6">
           <h2 className="text-lg font-semibold mb-4">Recent Activity</h2>
-          <div className="space-y-3">
-            {recentActivity.map((activity) => (
-              <div
-                key={activity.id}
-                className="table-row-hover flex items-center justify-between p-3 border border-border rounded-lg"
-              >
-                <div className="flex-1">
-                  <p className="font-medium text-foreground">
-                    {activity.member}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {activity.action} "{activity.book}"
-                  </p>
+          {isLoading ? (
+            <div className="space-y-3">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="h-16 bg-muted rounded-lg animate-pulse" />
+              ))}
+            </div>
+          ) : recentActivity.length > 0 ? (
+            <div className="space-y-3">
+              {recentActivity.map((activity) => (
+                <div
+                  key={activity.id}
+                  className="table-row-hover flex items-center justify-between p-3 border border-border rounded-lg"
+                >
+                  <div className="flex-1">
+                    <p className="font-medium text-foreground">
+                      {activity.member}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {activity.action} "{activity.book}"
+                    </p>
+                  </div>
+                  <span className="text-sm text-muted-foreground">
+                    {activity.date}
+                  </span>
                 </div>
-                <span className="text-sm text-muted-foreground">
-                  {activity.date}
-                </span>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-muted-foreground text-center py-8">
+              No recent activity
+            </p>
+          )}
         </div>
       </div>
     </Layout>
