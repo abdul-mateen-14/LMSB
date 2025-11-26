@@ -106,19 +106,23 @@ mysql -u root -p < backend/sql/schema.sql
 ## Common Issues
 
 ### "Can't connect to database"
+
 - Check MySQL is running
 - Verify credentials in `backend/src/main.cpp`
 - Run: `mysql -u root -p -e "USE library_db;"`
 
 ### "Port 8080/5173 already in use"
+
 - Kill process: `lsof -i :8080` (then `kill <PID>`)
 - Or change port in backend/src/main.cpp
 
 ### "API not found" errors
+
 - Ensure backend is running on port 8080
 - Check http://localhost:8080/api/health
 
 ### "Module not found" errors
+
 ```bash
 rm -rf node_modules
 npm cache clean --force
@@ -175,6 +179,7 @@ curl http://localhost:8080/api/reports/dashboard
 ## Database Credentials
 
 Default (from schema.sql):
+
 ```
 Host: localhost
 User: root

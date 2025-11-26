@@ -2,11 +2,7 @@ import Layout from "@/components/Layout";
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Save, Bell, Database, Loader2 } from "lucide-react";
-import {
-  LibrarySettings,
-  getSettings,
-  updateSettings,
-} from "@shared/api";
+import { LibrarySettings, getSettings, updateSettings } from "@shared/api";
 import { useToast } from "@/hooks/use-toast";
 
 const SettingsPage = () => {
@@ -26,7 +22,11 @@ const SettingsPage = () => {
   });
 
   // Fetch settings
-  const { data: librarySettings, isLoading, error } = useQuery({
+  const {
+    data: librarySettings,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["settings"],
     queryFn: getSettings,
   });
@@ -69,7 +69,7 @@ const SettingsPage = () => {
 
   const handleInputChange = (
     key: keyof LibrarySettings,
-    value: string | number | boolean
+    value: string | number | boolean,
   ) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
   };
@@ -229,7 +229,7 @@ const SettingsPage = () => {
                       onChange={(e) =>
                         handleInputChange(
                           "borrow_limit",
-                          parseInt(e.target.value)
+                          parseInt(e.target.value),
                         )
                       }
                       min="1"
@@ -246,7 +246,7 @@ const SettingsPage = () => {
                       onChange={(e) =>
                         handleInputChange(
                           "borrow_duration_days",
-                          parseInt(e.target.value)
+                          parseInt(e.target.value),
                         )
                       }
                       min="1"
@@ -264,7 +264,7 @@ const SettingsPage = () => {
                       onChange={(e) =>
                         handleInputChange(
                           "late_fee_per_day",
-                          parseFloat(e.target.value)
+                          parseFloat(e.target.value),
                         )
                       }
                       min="0"
@@ -310,7 +310,10 @@ const SettingsPage = () => {
                     type="checkbox"
                     checked={settings.enable_notifications || false}
                     onChange={(e) =>
-                      handleInputChange("enable_notifications", e.target.checked)
+                      handleInputChange(
+                        "enable_notifications",
+                        e.target.checked,
+                      )
                     }
                     className="w-4 h-4 rounded border-border cursor-pointer"
                   />
@@ -351,7 +354,8 @@ const SettingsPage = () => {
                   <div>
                     <p className="font-medium text-foreground">Admin Alerts</p>
                     <p className="text-sm text-muted-foreground">
-                      Receive alerts for overdue books and system events (Coming soon)
+                      Receive alerts for overdue books and system events (Coming
+                      soon)
                     </p>
                   </div>
                 </label>

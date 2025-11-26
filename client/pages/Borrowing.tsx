@@ -38,7 +38,11 @@ const BorrowingPage = () => {
   });
 
   // Fetch borrow records
-  const { data: borrowRecords = [], isLoading, error } = useQuery({
+  const {
+    data: borrowRecords = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["borrowing", filterStatus],
     queryFn: () =>
       filterStatus === "all"
@@ -112,9 +116,12 @@ const BorrowingPage = () => {
   });
 
   const stats = {
-    active: borrowRecords.filter((r: BorrowRecord) => r.status === "active").length,
-    returned: borrowRecords.filter((r: BorrowRecord) => r.status === "returned").length,
-    overdue: borrowRecords.filter((r: BorrowRecord) => r.status === "overdue").length,
+    active: borrowRecords.filter((r: BorrowRecord) => r.status === "active")
+      .length,
+    returned: borrowRecords.filter((r: BorrowRecord) => r.status === "returned")
+      .length,
+    overdue: borrowRecords.filter((r: BorrowRecord) => r.status === "overdue")
+      .length,
   };
 
   const getStatusBadge = (status: string) => {
@@ -235,7 +242,10 @@ const BorrowingPage = () => {
         {isAddingBorrow && (
           <div className="card-hover p-6 bg-muted/30 border-primary/30">
             <h2 className="text-lg font-semibold mb-4">Record New Borrow</h2>
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <form
+              onSubmit={handleSubmit}
+              className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+            >
               <select
                 value={formData.member_id}
                 onChange={(e) =>
@@ -374,7 +384,7 @@ const BorrowingPage = () => {
                           {getStatusIcon(record.status)}
                           <span
                             className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(
-                              record.status
+                              record.status,
                             )}`}
                           >
                             {record.status.charAt(0).toUpperCase() +

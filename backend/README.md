@@ -31,18 +31,22 @@ A RESTful API backend for a library management system built with the Crow C++ we
 ### Installation
 
 #### Ubuntu/Debian
+
 ```bash
 sudo apt-get update
 sudo apt-get install cmake build-essential libmysqlclient-dev libboost-all-dev nlohmann-json3-dev
 ```
 
 #### macOS
+
 ```bash
 brew install cmake mysql boost nlohmann-json
 ```
 
 #### Windows
+
 Use vcpkg or pre-built binaries:
+
 ```bash
 vcpkg install mysql:x64-windows boost:x64-windows nlohmann-json:x64-windows
 ```
@@ -56,6 +60,7 @@ mysql -u root -p < sql/schema.sql
 ```
 
 This will:
+
 - Create the `library_db` database
 - Create all necessary tables (books, members, borrow_records, settings)
 - Insert sample data
@@ -112,6 +117,7 @@ curl http://localhost:8080/api/health
 ```
 
 Expected response:
+
 ```json
 {
   "status": "ok",
@@ -122,6 +128,7 @@ Expected response:
 ## API Endpoints
 
 ### Books
+
 - `GET /api/books` - List all books
 - `GET /api/books/<id>` - Get book by ID
 - `GET /api/books/search?q=<query>&category=<category>` - Search books
@@ -130,6 +137,7 @@ Expected response:
 - `DELETE /api/books/<id>` - Delete book
 
 ### Members
+
 - `GET /api/members` - List all members
 - `GET /api/members/<id>` - Get member by ID
 - `GET /api/members/search?q=<query>` - Search members
@@ -139,6 +147,7 @@ Expected response:
 - `DELETE /api/members/<id>` - Delete member
 
 ### Borrowing
+
 - `GET /api/borrowing` - List all borrowing records
 - `GET /api/borrowing/<id>` - Get borrowing record by ID
 - `GET /api/borrowing/member/<member_id>` - Get borrows by member
@@ -150,12 +159,14 @@ Expected response:
 - `DELETE /api/borrowing/<id>` - Delete borrowing record
 
 ### Reports
+
 - `GET /api/reports/statistics` - Get borrowing statistics
 - `GET /api/reports/monthly` - Get monthly statistics
 - `GET /api/reports/top-books` - Get top borrowed books
 - `GET /api/reports/dashboard` - Get dashboard metrics
 
 ### Settings
+
 - `GET /api/settings` - Get library settings
 - `PUT /api/settings` - Update library settings
 
@@ -251,16 +262,19 @@ curl "http://localhost:8080/api/books/search?q=test&category=Fiction"
 ## Troubleshooting
 
 ### MySQL Connection Error
+
 - Verify MySQL server is running
 - Check database credentials in `src/main.cpp`
 - Ensure database exists: `mysql -u root -p -e "SHOW DATABASES;"`
 
 ### Build Errors
+
 - Ensure all dependencies are installed
 - Check compiler version: `g++ --version` (should support C++17)
 - Try clearing build directory: `rm -rf build && mkdir build && cd build`
 
 ### Port Already in Use
+
 - Change port in `src/main.cpp`: `app.port(8080)`
 - Or kill process using port: `lsof -i :8080` (Unix)
 
@@ -273,6 +287,7 @@ The API includes CORS headers to allow requests from any origin. This is configu
 API responses follow this format:
 
 ### Success Response
+
 ```json
 {
   "data": {...}
@@ -280,6 +295,7 @@ API responses follow this format:
 ```
 
 ### Error Response
+
 ```json
 {
   "error": "Error message here"

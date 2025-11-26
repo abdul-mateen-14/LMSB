@@ -95,10 +95,7 @@ const ReportsPage = () => {
   ];
 
   const isLoading =
-    dashboardLoading ||
-    monthlyLoading ||
-    booksLoading ||
-    statsLoading;
+    dashboardLoading || monthlyLoading || booksLoading || statsLoading;
 
   return (
     <Layout>
@@ -180,7 +177,10 @@ const ReportsPage = () => {
                       strokeDasharray="3 3"
                       stroke="hsl(var(--border))"
                     />
-                    <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" />
+                    <XAxis
+                      dataKey="month"
+                      stroke="hsl(var(--muted-foreground))"
+                    />
                     <YAxis stroke="hsl(var(--muted-foreground))" />
                     <Tooltip
                       contentStyle={{
@@ -245,7 +245,9 @@ const ReportsPage = () => {
         {/* Activity Timeline */}
         {borrowTrendData.length > 0 && (
           <div className="card-hover p-6">
-            <h2 className="text-lg font-semibold mb-4">Annual Borrowing Trend</h2>
+            <h2 className="text-lg font-semibold mb-4">
+              Annual Borrowing Trend
+            </h2>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={borrowTrendData}>
                 <CartesianGrid

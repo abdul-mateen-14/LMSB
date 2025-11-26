@@ -15,6 +15,7 @@ This project provides a complete solution for managing a library's operations in
 ## Tech Stack
 
 ### Frontend
+
 - **React 18** with TypeScript
 - **Vite** for fast development and building
 - **React Router 6** for SPA routing
@@ -24,6 +25,7 @@ This project provides a complete solution for managing a library's operations in
 - **Lucide React** for icons
 
 ### Backend
+
 - **C++ 17** with Crow web framework
 - **MySQL** for data persistence
 - **CMake** for build configuration
@@ -84,6 +86,7 @@ pnpm dev
 #### 4. Access the Application
 
 Open your browser and navigate to:
+
 - **Frontend**: http://localhost:5173
 - **Backend API**: http://localhost:8080/api
 
@@ -136,6 +139,7 @@ project-root/
 ## API Documentation
 
 ### Base URL
+
 ```
 http://localhost:8080/api
 ```
@@ -143,6 +147,7 @@ http://localhost:8080/api
 ### Endpoints
 
 #### Books
+
 - `GET /books` - List all books
 - `GET /books/<id>` - Get book details
 - `GET /books/search?q=<query>&category=<category>` - Search books
@@ -151,6 +156,7 @@ http://localhost:8080/api
 - `DELETE /books/<id>` - Delete book
 
 #### Members
+
 - `GET /members` - List all members
 - `GET /members/<id>` - Get member details
 - `GET /members/search?q=<query>` - Search members
@@ -160,6 +166,7 @@ http://localhost:8080/api
 - `DELETE /members/<id>` - Delete member
 
 #### Borrowing
+
 - `GET /borrowing` - List all borrowing records
 - `GET /borrowing/<id>` - Get borrowing details
 - `GET /borrowing/member/<member_id>` - Get member's borrows
@@ -171,18 +178,21 @@ http://localhost:8080/api
 - `DELETE /borrowing/<id>` - Delete borrowing record
 
 #### Reports
+
 - `GET /reports/statistics` - Get borrowing statistics
 - `GET /reports/monthly` - Get monthly statistics
 - `GET /reports/top-books` - Get top borrowed books
 - `GET /reports/dashboard` - Get dashboard metrics
 
 #### Settings
+
 - `GET /settings` - Get library settings
 - `PUT /settings` - Update library settings
 
 ### Example Requests
 
 #### Create a Book
+
 ```bash
 curl -X POST http://localhost:8080/api/books \
   -H "Content-Type: application/json" \
@@ -197,6 +207,7 @@ curl -X POST http://localhost:8080/api/books \
 ```
 
 #### Create a Member
+
 ```bash
 curl -X POST http://localhost:8080/api/members \
   -H "Content-Type: application/json" \
@@ -210,6 +221,7 @@ curl -X POST http://localhost:8080/api/members \
 ```
 
 #### Record a Borrow
+
 ```bash
 curl -X POST http://localhost:8080/api/borrowing \
   -H "Content-Type: application/json" \
@@ -261,6 +273,7 @@ make -j$(nproc)
 ### Tables
 
 #### books
+
 - id (Primary Key)
 - title
 - author
@@ -273,6 +286,7 @@ make -j$(nproc)
 - updated_at
 
 #### members
+
 - id (Primary Key)
 - member_id (Unique)
 - name
@@ -285,6 +299,7 @@ make -j$(nproc)
 - updated_at
 
 #### borrow_records
+
 - id (Primary Key)
 - member_id (Foreign Key)
 - book_id (Foreign Key)
@@ -297,6 +312,7 @@ make -j$(nproc)
 - updated_at
 
 #### settings
+
 - id (Primary Key)
 - library_name
 - email
@@ -337,27 +353,32 @@ REACT_APP_API_URL=http://localhost:8080/api
 ### Backend Issues
 
 #### MySQL Connection Failed
+
 - Ensure MySQL server is running
 - Check username/password in `src/main.cpp`
 - Verify database exists: `mysql -u root -p -e "USE library_db;"`
 
 #### Build Errors
+
 - Clear build directory: `rm -rf build/`
 - Reinstall dependencies
 - Ensure C++ compiler supports C++17: `g++ --version`
 
 #### Port Already in Use
+
 - Change port in `src/main.cpp`
 - Or kill the process: `lsof -i :8080`
 
 ### Frontend Issues
 
 #### API Connection Failed
+
 - Verify backend is running on port 8080
 - Check `REACT_APP_API_URL` in `.env`
 - Check browser console for CORS errors
 
 #### Dependencies Not Installing
+
 - Clear node_modules: `rm -rf node_modules`
 - Clear cache: `pnpm store prune`
 - Reinstall: `pnpm install`
@@ -365,11 +386,13 @@ REACT_APP_API_URL=http://localhost:8080/api
 ## Performance Optimization
 
 ### Frontend
+
 - Implemented React Query for efficient data fetching
 - Lazy loading of components
 - Optimized bundle size with tree-shaking
 
 ### Backend
+
 - Database indexes on frequently queried columns
 - Connection pooling (can be added)
 - Multithreaded request handling
@@ -415,11 +438,13 @@ For issues, questions, or suggestions, please refer to the documentation in `bac
 ### Backend Deployment
 
 The backend can be deployed to:
+
 - Linux servers (Ubuntu, CentOS, etc.)
 - Docker containers
 - Cloud platforms (AWS, GCP, Azure)
 
 Build a release binary:
+
 ```bash
 cd backend/build
 cmake --build . --config Release
@@ -428,6 +453,7 @@ cmake --build . --config Release
 ### Frontend Deployment
 
 Use any static hosting service:
+
 - Netlify
 - Vercel
 - GitHub Pages
@@ -435,6 +461,7 @@ Use any static hosting service:
 - Cloudflare Pages
 
 Build for production:
+
 ```bash
 pnpm build
 # Output will be in `dist/` directory

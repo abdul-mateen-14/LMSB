@@ -1,12 +1,6 @@
 import Layout from "@/components/Layout";
 import { useQuery } from "@tanstack/react-query";
-import {
-  BookOpen,
-  Users,
-  RotateCcw,
-  AlertCircle,
-  Loader2,
-} from "lucide-react";
+import { BookOpen, Users, RotateCcw, AlertCircle, Loader2 } from "lucide-react";
 import {
   LineChart,
   Line,
@@ -297,7 +291,10 @@ const Dashboard = () => {
           {isLoading ? (
             <div className="space-y-3">
               {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="h-16 bg-muted rounded-lg animate-pulse" />
+                <div
+                  key={i}
+                  className="h-16 bg-muted rounded-lg animate-pulse"
+                />
               ))}
             </div>
           ) : recentActivity.length > 0 ? (

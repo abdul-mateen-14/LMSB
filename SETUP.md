@@ -181,6 +181,7 @@ yarn dev
 ```
 
 You should see output like:
+
 ```
   VITE v4.x.x  ready in xxx ms
 
@@ -222,14 +223,16 @@ curl http://localhost:8080/api/health
 **Error**: "Can't connect to MySQL server"
 
 **Solutions**:
+
 1. Verify MySQL is running:
+
    ```bash
    # macOS
    brew services list | grep mysql
-   
+
    # Linux
    sudo systemctl status mysql
-   
+
    # Windows - Check Services or Task Manager
    ```
 
@@ -245,6 +248,7 @@ curl http://localhost:8080/api/health
 **Error**: "CMake not found" or "cmake: command not found"
 
 **Solutions**:
+
 1. Install CMake for your OS
 2. Add CMake to PATH:
    - macOS/Linux: Usually automatic
@@ -253,6 +257,7 @@ curl http://localhost:8080/api/health
 **Error**: "MySQL not found" during build
 
 **Solutions**:
+
 1. Install MySQL development libraries
 2. On macOS: `brew install mysql`
 3. On Linux: `sudo apt-get install libmysqlclient-dev`
@@ -262,6 +267,7 @@ curl http://localhost:8080/api/health
 **Error**: "npm: command not found"
 
 **Solutions**:
+
 1. Install Node.js from https://nodejs.org/
 2. Restart terminal after installation
 3. Verify: `node --version`
@@ -269,6 +275,7 @@ curl http://localhost:8080/api/health
 **Error**: "Cannot find module" when running dev server
 
 **Solutions**:
+
 1. Clear node_modules: `rm -rf node_modules`
 2. Clear npm cache: `npm cache clean --force`
 3. Reinstall: `npm install`
@@ -280,6 +287,7 @@ curl http://localhost:8080/api/health
 **Solutions**:
 
 For Backend (port 8080):
+
 ```bash
 # macOS/Linux - Find and kill process
 lsof -i :8080
@@ -290,6 +298,7 @@ kill -9 <PID>
 ```
 
 For Frontend (port 5173):
+
 ```bash
 # macOS/Linux - Find and kill process
 lsof -i :5173
@@ -303,7 +312,9 @@ kill -9 <PID>
 **Error**: "Cannot create table, database not found"
 
 **Solutions**:
+
 1. Verify schema was imported:
+
    ```bash
    mysql -u root -p library_db
    SHOW TABLES;
@@ -319,6 +330,7 @@ kill -9 <PID>
 Keep two terminal windows open:
 
 **Terminal 1 - Backend**:
+
 ```bash
 cd backend/build
 ./library_server
@@ -326,6 +338,7 @@ cd backend/build
 ```
 
 **Terminal 2 - Frontend**:
+
 ```bash
 npm run dev
 # Stays running, shows: "Local: http://localhost:5173/"
@@ -356,11 +369,13 @@ npm run dev
 ### Making Changes
 
 **Frontend Changes**:
+
 - Edit files in `client/`
 - Dev server auto-reloads (hot reload)
 - No rebuild needed
 
 **Backend Changes**:
+
 1. Edit files in `backend/src/` or `backend/include/`
 2. In `backend/build/` directory:
    ```bash
@@ -407,6 +422,7 @@ For deploying to production, see the main `README.md` file for deployment instru
 ## Summary
 
 You now have:
+
 - ✅ MySQL database running with schema imported
 - ✅ C++ Crow backend compiled and running on port 8080
 - ✅ React frontend running on port 5173

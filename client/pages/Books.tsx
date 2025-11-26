@@ -11,7 +11,14 @@ import {
   ChevronDown,
   Loader2,
 } from "lucide-react";
-import { Book, BookCreateRequest, getBooks, searchBooks, createBook, deleteBook } from "@shared/api";
+import {
+  Book,
+  BookCreateRequest,
+  getBooks,
+  searchBooks,
+  createBook,
+  deleteBook,
+} from "@shared/api";
 import { useToast } from "@/hooks/use-toast";
 
 const BooksPage = () => {
@@ -21,7 +28,7 @@ const BooksPage = () => {
   const [filterCategory, setFilterCategory] = useState("all");
   const [isAddingBook, setIsAddingBook] = useState(false);
   const [sortBy, setSortBy] = useState<"title" | "author" | "category">(
-    "title"
+    "title",
   );
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [formData, setFormData] = useState({
@@ -34,7 +41,11 @@ const BooksPage = () => {
   });
 
   // Fetch books
-  const { data: books = [], isLoading, error } = useQuery({
+  const {
+    data: books = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["books"],
     queryFn: getBooks,
   });
@@ -179,7 +190,10 @@ const BooksPage = () => {
         {isAddingBook && (
           <div className="card-hover p-6 bg-muted/30 border-primary/30">
             <h2 className="text-lg font-semibold mb-4">Add New Book</h2>
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <form
+              onSubmit={handleSubmit}
+              className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+            >
               <input
                 type="text"
                 placeholder="Title"
@@ -335,7 +349,7 @@ const BooksPage = () => {
                   {sortedBooks.map((book: Book) => {
                     const status = getStatusBadge(
                       book.available_copies,
-                      book.total_copies
+                      book.total_copies,
                     );
                     return (
                       <tr

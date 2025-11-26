@@ -36,12 +36,14 @@ const MembersPage = () => {
   });
 
   // Fetch members
-  const { data: members = [], isLoading, error } = useQuery({
+  const {
+    data: members = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["members", filterStatus],
     queryFn: () =>
-      filterStatus === "all"
-        ? getMembers()
-        : getMembersByStatus(filterStatus),
+      filterStatus === "all" ? getMembers() : getMembersByStatus(filterStatus),
   });
 
   // Create member mutation
@@ -170,7 +172,10 @@ const MembersPage = () => {
         {isAddingMember && (
           <div className="card-hover p-6 bg-muted/30 border-primary/30">
             <h2 className="text-lg font-semibold mb-4">Add New Member</h2>
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <form
+              onSubmit={handleSubmit}
+              className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+            >
               <input
                 type="text"
                 placeholder="Full Name"
@@ -263,7 +268,7 @@ const MembersPage = () => {
                   </div>
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadge(
-                      member.status
+                      member.status,
                     )}`}
                   >
                     {member.status.charAt(0).toUpperCase() +

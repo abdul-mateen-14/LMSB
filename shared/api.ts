@@ -40,7 +40,7 @@ export interface Member {
   email: string;
   phone?: string;
   address?: string;
-  status: 'active' | 'inactive' | 'suspended';
+  status: "active" | "inactive" | "suspended";
   join_date: string;
 }
 
@@ -62,7 +62,7 @@ export interface BorrowRecord {
   borrow_date: string;
   due_date: string;
   return_date?: string;
-  status: 'active' | 'returned' | 'overdue';
+  status: "active" | "returned" | "overdue";
   fine_amount: number;
 }
 
@@ -120,15 +120,15 @@ export interface DemoResponse {
 }
 
 // API client utilities
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
+const API_BASE = process.env.REACT_APP_API_URL || "http://localhost:8080/api";
 
 export async function fetchFromAPI<T>(
   endpoint: string,
-  options?: RequestInit
+  options?: RequestInit,
 ): Promise<T> {
   const response = await fetch(`${API_BASE}${endpoint}`, {
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       ...options?.headers,
     },
     ...options,
@@ -142,41 +142,47 @@ export async function fetchFromAPI<T>(
 }
 
 export async function getBooks(): Promise<Book[]> {
-  return fetchFromAPI('/books');
+  return fetchFromAPI("/books");
 }
 
 export async function getBook(id: number): Promise<Book> {
   return fetchFromAPI(`/books/${id}`);
 }
 
-export async function searchBooks(query: string, category?: string): Promise<Book[]> {
+export async function searchBooks(
+  query: string,
+  category?: string,
+): Promise<Book[]> {
   const params = new URLSearchParams({ q: query });
-  if (category) params.append('category', category);
+  if (category) params.append("category", category);
   return fetchFromAPI(`/books/search?${params.toString()}`);
 }
 
 export async function createBook(data: BookCreateRequest): Promise<void> {
-  return fetchFromAPI('/books', {
-    method: 'POST',
+  return fetchFromAPI("/books", {
+    method: "POST",
     body: JSON.stringify(data),
   });
 }
 
-export async function updateBook(id: number, data: Partial<Book>): Promise<void> {
+export async function updateBook(
+  id: number,
+  data: Partial<Book>,
+): Promise<void> {
   return fetchFromAPI(`/books/${id}`, {
-    method: 'PUT',
+    method: "PUT",
     body: JSON.stringify(data),
   });
 }
 
 export async function deleteBook(id: number): Promise<void> {
   return fetchFromAPI(`/books/${id}`, {
-    method: 'DELETE',
+    method: "DELETE",
   });
 }
 
 export async function getMembers(): Promise<Member[]> {
-  return fetchFromAPI('/members');
+  return fetchFromAPI("/members");
 }
 
 export async function getMember(id: number): Promise<Member> {
@@ -192,81 +198,90 @@ export async function getMembersByStatus(status: string): Promise<Member[]> {
 }
 
 export async function createMember(data: MemberCreateRequest): Promise<void> {
-  return fetchFromAPI('/members', {
-    method: 'POST',
+  return fetchFromAPI("/members", {
+    method: "POST",
     body: JSON.stringify(data),
   });
 }
 
-export async function updateMember(id: number, data: Partial<Member>): Promise<void> {
+export async function updateMember(
+  id: number,
+  data: Partial<Member>,
+): Promise<void> {
   return fetchFromAPI(`/members/${id}`, {
-    method: 'PUT',
+    method: "PUT",
     body: JSON.stringify(data),
   });
 }
 
 export async function deleteMember(id: number): Promise<void> {
   return fetchFromAPI(`/members/${id}`, {
-    method: 'DELETE',
+    method: "DELETE",
   });
 }
 
 export async function getBorrowRecords(): Promise<BorrowRecord[]> {
-  return fetchFromAPI('/borrowing');
+  return fetchFromAPI("/borrowing");
 }
 
 export async function getBorrowRecord(id: number): Promise<BorrowRecord> {
   return fetchFromAPI(`/borrowing/${id}`);
 }
 
-export async function getMemberBorrows(memberId: number): Promise<BorrowRecord[]> {
+export async function getMemberBorrows(
+  memberId: number,
+): Promise<BorrowRecord[]> {
   return fetchFromAPI(`/borrowing/member/${memberId}`);
 }
 
-export async function getBorrowsByStatus(status: string): Promise<BorrowRecord[]> {
+export async function getBorrowsByStatus(
+  status: string,
+): Promise<BorrowRecord[]> {
   return fetchFromAPI(`/borrowing/status/${status}`);
 }
 
 export async function getOverdueBorrows(): Promise<BorrowRecord[]> {
-  return fetchFromAPI('/borrowing/overdue');
+  return fetchFromAPI("/borrowing/overdue");
 }
 
 export async function createBorrow(data: BorrowCreateRequest): Promise<void> {
-  return fetchFromAPI('/borrowing', {
-    method: 'POST',
+  return fetchFromAPI("/borrowing", {
+    method: "POST",
     body: JSON.stringify(data),
   });
 }
 
 export async function recordReturn(borrowId: number): Promise<void> {
   return fetchFromAPI(`/borrowing/${borrowId}/return`, {
-    method: 'POST',
+    method: "POST",
   });
 }
 
 export async function getStatistics(): Promise<Statistics> {
-  return fetchFromAPI('/reports/statistics');
+  return fetchFromAPI("/reports/statistics");
 }
 
 export async function getMonthlyStats(): Promise<MonthlyStats[]> {
-  return fetchFromAPI('/reports/monthly');
+  return fetchFromAPI("/reports/monthly");
 }
 
 export async function getTopBooks(): Promise<TopBook[]> {
-  return fetchFromAPI('/reports/top-books');
+  return fetchFromAPI("/reports/top-books");
 }
 
 export async function getDashboardData(): Promise<DashboardData> {
-  return fetchFromAPI('/reports/dashboard');
+  return fetchFromAPI("/reports/dashboard");
 }
 
 export async function getSettings(): Promise<LibrarySettings> {
-  return fetchFromAPI('/settings');
+  return fetchFromAPI("/settings");
 }
 
-export async function updateSettings(data: Partial<LibrarySettings>): Promise<void> {
-  return fetchFromAPI('/settings', {
-    method: 'PUT',
+export async function updateSettings(
+  data: Partial<LibrarySettings>,
+): Promise<void> {
+  return fetchFromAPI("/settings", {
+    method: "PUT",
     body: JSON.stringify(data),
   });
 }
